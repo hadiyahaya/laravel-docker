@@ -5,10 +5,18 @@
             <flux:subheading>{{ __('All registered users') }}</flux:subheading>
         </div>
 
-        <form method="GET" action="{{ route('users.index') }}" class="flex w-full max-w-sm gap-2">
-            <flux:input name="search" :value="$search" icon="magnifying-glass" :placeholder="__('Search name or email')" />
-            <flux:button type="submit">{{ __('Search') }}</flux:button>
-        </form>
+        <div class="flex w-full max-w-lg items-center justify-end gap-2">
+            <form method="GET" action="{{ route('users.index') }}" class="flex w-full gap-2">
+                <flux:input name="search" :value="$search" icon="magnifying-glass" :placeholder="__('Search name or email')" />
+                <flux:button type="submit">{{ __('Search') }}</flux:button>
+            </form>
+
+            @can('emailAny', App\Models\User::class)
+                <flux:button variant="primary" icon="envelope" :href="route('users.email-bulk.create', ['search' => $search ?: null])">
+                    {{ __('Email all') }}
+                </flux:button>
+            @endcan
+        </div>
     </div>
 
     @if (session('status'))
@@ -55,6 +63,12 @@
 
                     <flux:table.cell align="end">
                         <div class="flex justify-end gap-1">
+                            @can('email', $user)
+                                <flux:button size="sm" variant="ghost" icon="envelope" :href="route('users.email.create', $user)">
+                                    {{ __('Email') }}
+                                </flux:button>
+                            @endcan
+
                             @can('update', $user)
                                 <flux:button size="sm" variant="ghost" icon="shield-check" :href="route('users.edit', $user)">
                                     {{ __('Edit role') }}

@@ -50,4 +50,22 @@ class UserPolicy
             && $user->isNot($model)
             && ! $model->hasRole('super-admin');
     }
+
+    /**
+     * Can the user send an email to this user?
+     * Nobody needs to email themselves from here.
+     */
+    public function email(User $user, User $model): bool
+    {
+        return $user->can('email users')
+            && $user->isNot($model);
+    }
+
+    /**
+     * Can the user send an email to many users at once?
+     */
+    public function emailAny(User $user): bool
+    {
+        return $user->can('email users');
+    }
 }
