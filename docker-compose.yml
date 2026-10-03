@@ -1,0 +1,69 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8080"
+    volumes:
+      - .:/var/www/html
+    environment:
+      HEALTHCHECK_PATH: /up
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["php", "/var/www/html/artisan", "queue:work", "--tries=3"]
+    stop_signal: SIGTERM
+    volumes:
+      - .:/var/www/html
+    healthcheck:
+      test: ["CMD", "healthcheck-queue"]
+      start_period: 10s
+    depends_on:
+      - app
+
+  mariadb:
+    image: mariadb:11.4
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${FORWARD_REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${FORWARD_MAILPIT_PORT:-1025}:1025"
+      - "${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025"
+
+volumes:
+  mariadb-data:
+  redis-data:
