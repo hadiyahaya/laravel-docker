@@ -88,9 +88,6 @@ class UserEmailController extends Controller
     {
         return User::query()
             ->whereKeyNot($request->user()->getKey())
-            ->when($search, fn ($query) => $query->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            }));
+            ->search($search);
     }
 }

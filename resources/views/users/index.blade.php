@@ -27,6 +27,8 @@
         <flux:table.columns>
             <flux:table.column>{{ __('Name') }}</flux:table.column>
             <flux:table.column>{{ __('Email') }}</flux:table.column>
+            <flux:table.column>{{ __('Department') }}</flux:table.column>
+            <flux:table.column>{{ __('Projects') }}</flux:table.column>
             <flux:table.column>{{ __('Roles') }}</flux:table.column>
             <flux:table.column>{{ __('Verified') }}</flux:table.column>
             <flux:table.column>{{ __('Joined') }}</flux:table.column>
@@ -42,6 +44,10 @@
                     </flux:table.cell>
 
                     <flux:table.cell>{{ $user->email }}</flux:table.cell>
+
+                    <flux:table.cell>{{ $user->department?->code ?? '-' }}</flux:table.cell>
+
+                    <flux:table.cell>{{ $user->projects_count }}</flux:table.cell>
 
                     <flux:table.cell>
                         @forelse ($user->roles as $role)
@@ -91,7 +97,7 @@
                 </flux:table.row>
             @empty
                 <flux:table.row>
-                    <flux:table.cell colspan="6" class="text-center">{{ __('No users found.') }}</flux:table.cell>
+                    <flux:table.cell colspan="8" class="text-center">{{ __('No users found.') }}</flux:table.cell>
                 </flux:table.row>
             @endforelse
         </flux:table.rows>

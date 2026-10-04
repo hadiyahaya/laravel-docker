@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserEmailController;
 use App\Models\User;
@@ -9,6 +10,8 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
+
+    Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
 
     Route::get('users', [UserController::class, 'index'])
         ->can('viewAny', User::class)

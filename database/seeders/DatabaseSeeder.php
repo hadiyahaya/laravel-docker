@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,7 +16,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RolePermissionSeeder::class);
+        $this->call([
+            RolePermissionSeeder::class,
+            DepartmentSeeder::class,
+        ]);
 
         User::factory()->create([
             'name' => 'Test User',
@@ -34,5 +38,15 @@ class DatabaseSeeder extends Seeder
 
         // Users without any role
         User::factory(25)->create();
+
+        // Put every user in a random department
+        $departments = Department::all();
+
+        User::query()->each(function (User $user) use ($departments) {
+            $user->department()->associate($departments->random());
+            $user->save();
+        });
+
+        $this->call(ProjectSeeder::class);
     }
 }

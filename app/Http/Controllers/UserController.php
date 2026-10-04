@@ -19,11 +19,9 @@ class UserController extends Controller
         $search = $request->string('search')->trim()->toString();
 
         $users = User::query()
-            ->with('roles')
-            ->when($search, fn ($query) => $query->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            }))
+            ->with(['roles', 'department'])
+            ->withCount('projects')
+            ->search($search)
             ->latest()
             ->paginate(10)
             ->withQueryString();
