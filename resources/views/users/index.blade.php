@@ -5,7 +5,7 @@
             <flux:subheading>{{ __('All registered users') }}</flux:subheading>
         </div>
 
-        <div class="flex w-full max-w-lg items-center justify-end gap-2">
+        <div class="flex w-full max-w-2xl items-center justify-end gap-2">
             <form method="GET" action="{{ route('users.index') }}" class="flex w-full gap-2">
                 <flux:input name="search" :value="$search" icon="magnifying-glass" :placeholder="__('Search name or email')" />
                 <flux:button type="submit">{{ __('Search') }}</flux:button>
@@ -16,6 +16,29 @@
                     {{ __('Email all') }}
                 </flux:button>
             @endcan
+
+            <flux:dropdown position="bottom" align="end">
+                <flux:button icon="queue-list" icon:trailing="chevron-down">{{ __('Say hello') }}</flux:button>
+
+                <flux:menu>
+                    @foreach ([
+                        'queue' => __('Queue 1 job'),
+                        'sync' => __('Run now (sync, wait 3s)'),
+                        'many' => __('Queue 4 jobs'),
+                        'delay' => __('Queue with 20s delay'),
+                    ] as $mode => $label)
+                        <form method="POST" action="{{ route('users.say-hello') }}" class="w-full">
+                            @csrf
+                            <input type="hidden" name="mode" value="{{ $mode }}">
+                            <input type="hidden" name="search" value="{{ $search }}">
+
+                            <flux:menu.item as="button" type="submit" class="w-full cursor-pointer">
+                                {{ $label }}
+                            </flux:menu.item>
+                        </form>
+                    @endforeach
+                </flux:menu>
+            </flux:dropdown>
         </div>
     </div>
 

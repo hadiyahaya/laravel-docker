@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\SayHelloController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserEmailController;
 use App\Models\User;
@@ -16,6 +17,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('users', [UserController::class, 'index'])
         ->can('viewAny', User::class)
         ->name('users.index');
+
+    // Demo: run the SayHello job (queue, sync, many, delay)
+    Route::post('users/say-hello', SayHelloController::class)
+        ->can('viewAny', User::class)
+        ->name('users.say-hello');
 
     // Bulk email - keep these above the users/{user} routes
     Route::get('users/email', [UserEmailController::class, 'createBulk'])
